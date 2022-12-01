@@ -3,7 +3,9 @@ package ru.netology.web.data;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.dbutils.QueryRunner;
 
+import java.sql.DriverManager;
 import java.time.LocalDate;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -44,4 +46,13 @@ public class DataHelper {
     public static LocalDate prevYear() {
         return LocalDate.now().minusYears(1);
     }
+
+//    public void setUp(){
+//        var runner = new QueryRunner();
+//        var dataSQL = "INSERT INTO payment_entity(amount, status) VALUES (?, ?)";
+//        try (var conn = DriverManager.getConnection("jdbc:mysql://185.119.57.47:3306/app", "app", "pass" );)
+//        {
+//            runner.update(conn, dataSQL, 45000, "?");
+//        }
+//    }
 }
