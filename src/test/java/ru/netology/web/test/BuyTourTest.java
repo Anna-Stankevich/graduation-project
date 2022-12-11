@@ -1,5 +1,7 @@
 package ru.netology.web.test;
 
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,6 +10,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import ru.netology.web.data.DataHelper;
 import ru.netology.web.page.OrderCardPage;
+
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import static com.codeborne.selenide.Selenide.open;
 
@@ -42,7 +47,7 @@ public class BuyTourTest {
     }
 
     @Test
-    @DisplayName("Проверяем, что при нажатии на кнопку «Продолжить», предварительно введя в форму валидные данные, кнопка на некоторое время становится некликабельной")
+    @DisplayName("Проверяем, что, введя в форму валидные данные, нажав на кнопку «Продолжить» она на некоторое время становится некликабельной")
     void shouldNotBeClickableButtonAfterClick() {
         var OrderCardPage = new OrderCardPage();
         var formFieldsInfo = DataHelper.getValidFieldSet();
@@ -437,5 +442,86 @@ public class BuyTourTest {
         String expected = "432";
         String actual = FormPage.getFieldValue("CVC/CVV");
         Assertions.assertEquals(expected, actual);
+    }
+
+    //---БАЗА ДАННЫХ---
+    @Test
+    @DisplayName("Проверяем, что приложение сохранет в своей БЗ успешно совершенный платеж по карте")
+    void shouldStoreTheSuccessfullyTheCompletedCardPaymentInTheDatabase() {
+        var dataSQL = "SELECT COUNT(id) FROM payment_entity WHERE status = 'APPROVED'";
+        var runner = new QueryRunner();
+        try (var conn = DriverManager.getConnection("jdbc:mysql://185.119.57.47:3306/app", "app", "pass");) {
+            Long count = runner.query(conn, dataSQL, new ScalarHandler<Long>());
+            var OrderCardPage = new OrderCardPage();
+            var formFieldsInfo = DataHelper.getValidFieldSet();
+            var CardPaymentPage = OrderCardPage.goToPaymentPage();
+            var FormPage = CardPaymentPage.goToFormPage();
+            FormPage.goToNotificationPage(formFieldsInfo);
+            FormPage.notificationOk();
+            Long actualCount = runner.query(conn, dataSQL, new ScalarHandler<Long>());
+            Assertions.assertEquals(count.intValue() + 1, actualCount.intValue());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @DisplayName("Проверяем, что приложение сохранет в своей БЗ успешно совершенную покупку в кредит")
+    void shouldStoreTheSuccessfullyTheCompletedPaymentOnTheCreditInTheDatabase() {
+        var dataSQL = "SELECT COUNT(id) FROM credit_request_entity WHERE status = 'APPROVED'";
+        var runner = new QueryRunner();
+        try (var conn = DriverManager.getConnection("jdbc:mysql://185.119.57.47:3306/app", "app", "pass");) {
+            Long count = runner.query(conn, dataSQL, new ScalarHandler<Long>());
+            var OrderCardPage = new OrderCardPage();
+            var formFieldsInfo = DataHelper.getValidFieldSet();
+            var CardPaymentOnCreditPage = OrderCardPage.goToPaymentOnCreditPage();
+            var FormPage = CardPaymentOnCreditPage.goToFormPage();
+            FormPage.goToNotificationPage(formFieldsInfo);
+            FormPage.activeNotification();
+            Long actualCount = runner.query(conn, dataSQL, new ScalarHandler<Long>());
+            Assertions.assertEquals(count.intValue() + 1, actualCount.intValue());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @DisplayName("Проверяем, что приложение сохранет в своей БЗ отказ в совершении платежа по карте")
+    void shouldStoreTheDenialOfCardPaymentInTheDatabase() {
+        var dataSQL = "SELECT COUNT(id) FROM payment_entity WHERE status = 'DECLINED'";
+        var runner = new QueryRunner();
+        try (var conn = DriverManager.getConnection("jdbc:mysql://185.119.57.47:3306/app", "app", "pass");) {
+            Long count = runner.query(conn, dataSQL, new ScalarHandler<Long>());
+            var OrderCardPage = new OrderCardPage();
+            var formFieldsInfo = DataHelper.getValidFieldSet();
+            formFieldsInfo.setCardNumber("4444444444444442");
+            var CardPaymentPage = OrderCardPage.goToPaymentPage();
+            var FormPage = CardPaymentPage.goToFormPage();
+            FormPage.goToNotificationPage(formFieldsInfo);
+            Long actualCount = runner.query(conn, dataSQL, new ScalarHandler<Long>());
+            Assertions.assertEquals(count.intValue() + 1, actualCount.intValue());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @DisplayName("Проверяем, что приложение сохранет в своей БЗ отказ в совершении покупке в кредит")
+    void shouldStoreTheDenialOfPaymentOnTheCreditInTheDatabase() {
+        var dataSQL = "SELECT COUNT(id) FROM credit_request_entity WHERE status = 'DECLINED'";
+        var runner = new QueryRunner();
+        try (var conn = DriverManager.getConnection("jdbc:mysql://185.119.57.47:3306/app", "app", "pass");) {
+            Long count = runner.query(conn, dataSQL, new ScalarHandler<Long>());
+            var OrderCardPage = new OrderCardPage();
+            var formFieldsInfo = DataHelper.getValidFieldSet();
+            formFieldsInfo.setCardNumber("4444444444444442");
+            var CardPaymentOnCreditPage = OrderCardPage.goToPaymentOnCreditPage();
+            var FormPage = CardPaymentOnCreditPage.goToFormPage();
+            FormPage.goToNotificationPage(formFieldsInfo);
+            Long actualCount = runner.query(conn, dataSQL, new ScalarHandler<Long>());
+            Assertions.assertEquals(count.intValue() + 1, actualCount.intValue());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

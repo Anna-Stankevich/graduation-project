@@ -17,6 +17,7 @@ public class FormPage {
     private SelenideElement notClickableButton = $$(".button__text").find(Condition.exactText("Отправляем запрос в Банк...")).closest("button");
     private SelenideElement notificationError = $(".notification_status_error");
     private SelenideElement notificationOk = $(".notification_status_ok");
+    private SelenideElement activeNotification = $(".notification_visible");
 
     public void fillingOutFormFields(DataHelper.FieldSet info){
         fieldSet.find(Condition.exactText("Номер карты")).closest(".input__inner").$(".input__control").setValue(info.getCardNumber());
@@ -36,7 +37,9 @@ public class FormPage {
         button.click();
         notClickableButton.shouldBe(visible, disabled);
     }
-
+    public void activeNotification(){
+        activeNotification.shouldBe(Condition.visible, Duration.ofSeconds(15));
+    }
     public void notificationError(){
         notificationError.shouldHave(Condition.text("Ошибка"), Duration.ofSeconds(15)).shouldBe(Condition.visible);
     }
