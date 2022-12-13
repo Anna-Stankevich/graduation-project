@@ -1,11 +1,11 @@
 package ru.netology.web.test;
 
+import com.codeborne.selenide.logevents.SelenideLogger;
+import io.qameta.allure.*;
+import io.qameta.allure.selenide.AllureSelenide;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import ru.netology.web.data.DataHelper;
@@ -16,13 +16,26 @@ import java.sql.SQLException;
 
 import static com.codeborne.selenide.Selenide.open;
 
+@Epic("Страница покупки тура")
 public class BuyTourTest {
+    @BeforeAll
+    static void setUpAll() {
+        SelenideLogger.addListener("allure", new AllureSelenide());
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        SelenideLogger.removeListener("allure");
+    }
+
     @BeforeEach
     void setupTest() {
         open("http://185.119.57.47:8080");
     }
 
     //---ФУНКЦИОНАЛ КНОПОК---
+    @Feature("Карточка тура")
+    @Story("Кнопки 'Купить' и 'Купить в кредит'")
     @Test
     @DisplayName("Проверяем статус кнопок на изначальной карточке заказа (обе должны быть красного цвета)")
     void shouldCheckButtonStatusOnTheOrderCard() {
@@ -30,6 +43,8 @@ public class BuyTourTest {
         OrderCardPage.buttonStatusExtraStart();
     }
 
+    @Feature("Карточка тура")
+    @Story("Кнопки 'Купить' и 'Купить в кредит'")
     @Test
     @DisplayName("Проверяем статус кнопок при клике на каждую (та, на которую кликнули должна быть белой, другая красной)")
     void shouldCheckButtonsStatus() {
@@ -38,6 +53,8 @@ public class BuyTourTest {
         OrderCardPage.buttonStatusExtraPaymentOnCredit();
     }
 
+    @Feature("Карточка тура")
+    @Story("Кнопки 'Купить' и 'Купить в кредит'")
     @Test
     @DisplayName("Проверяем, что при нажатии на конкретную кнопку переходим к нужной форме. Сначала к одной, потом к другой")
     void shouldGoesToTheDesiredFormOnButtonClick() {
@@ -46,6 +63,8 @@ public class BuyTourTest {
         OrderCardPage.goToPaymentOnCreditPage();
     }
 
+    @Feature("Карточка тура")
+    @Story("Кнопка 'Продолжить'")
     @Test
     @DisplayName("Проверяем, что, введя в форму валидные данные, нажав на кнопку «Продолжить» она на некоторое время становится некликабельной")
     void shouldNotBeClickableButtonAfterClick() {
@@ -57,6 +76,8 @@ public class BuyTourTest {
     }
 
     //---ОБЩЕЕ---
+    @Feature("Карточка тура")
+    @Story("Выпадающие сообщения")
     @Test
     @DisplayName("Проверяем выпадающее сообщение при покупке тура по карте, когда банк одобрил покупку")
     void shouldSuccessfulSendTheFormOnThePayment() {
@@ -68,6 +89,8 @@ public class BuyTourTest {
         FormPage.notificationOk();
     }
 
+    @Feature("Карточка тура")
+    @Story("Выпадающие сообщения")
     @Test
     @DisplayName("Проверяем выпадающее сообщение при покупке тура в кредит, когда банк одобрил кредит")
     void shouldSuccessfulSendTheFormOnThePaymentOnTheCredit() {
@@ -79,6 +102,8 @@ public class BuyTourTest {
         FormPage.notificationOk();
     }
 
+    @Feature("Карточка тура")
+    @Story("Выпадающие сообщения")
     @Test
     @DisplayName("Проверяем выпадающее сообщение при покупке тура по карте, когда банк отказал в покупке")
     void shouldBeDeniedPayment() {
@@ -91,6 +116,8 @@ public class BuyTourTest {
         FormPage.notificationError();
     }
 
+    @Feature("Карточка тура")
+    @Story("Выпадающие сообщения")
     @Test
     @DisplayName("Проверяем выпадающее сообщение при покупке тура в кредит, когда банк отказал в выдаче кредита")
     void shouldBeDeniedPaymentOnTheCredit() {
@@ -103,6 +130,8 @@ public class BuyTourTest {
         FormPage.notificationError();
     }
 
+    @Feature("Карточка тура")
+    @Story("Общее")
     @Test
     @DisplayName("Проверяем, что пустая форма не будет отправлена на сервер")
     void shouldNotSubmitAnEmptyForm() {
@@ -114,9 +143,11 @@ public class BuyTourTest {
 
     //---ВАЛИДАЦИЯ ПОЛЕЙ---
     //---ПОЛЕ НОМЕРА КАРТЫ---
+    @Feature("Форма")
+    @Story("Поле номера карты")
     @ParameterizedTest
-    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле карты заполнено невалидными значениями")
     @CsvFileSource(files = "src/test/resources/InvalidValuesCardNumber.csv")
+    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле карты заполнено невалидными значениями")
     void shouldShowAnErrorMessageBelowTheCardNumberField_InvalidValues(String text) {
         var OrderCardPage = new OrderCardPage();
         var formFieldsInfo = DataHelper.getValidFieldSet();
@@ -128,6 +159,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Номер карты", "Неверный формат");
     }
 
+    @Feature("Форма")
+    @Story("Поле номера карты")
     @Test
     @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле карты не заполнено")
     void shouldShowAnErrorMessageBelowTheCardNumberField_EmptyField() {
@@ -141,6 +174,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Номер карты", "Поле обязательно для заполнения");
     }
 
+    @Feature("Форма")
+    @Story("Поле номера карты")
     @Test
     @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле карты заполнено нулями")
     void shouldShowAnErrorMessageBelowTheCardNumberField_OnlyZero() {
@@ -154,6 +189,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Номер карты", "Неверный формат");
     }
 
+    @Feature("Форма")
+    @Story("Поле номера карты")
     @Test
     @DisplayName("Проверяем, что введение пробела в поле карты игнорируется")
     void shouldBeSpaceIgnored() {
@@ -165,6 +202,8 @@ public class BuyTourTest {
         FormPage.goToNotificationPage(formFieldsInfo);
     }
 
+    @Feature("Форма")
+    @Story("Поле номера карты")
     @Test
     @DisplayName("Проверяем, что нельзя ввести в поле карты более 16-ти цифр")
     void canOnlyEnter16Digits() {
@@ -178,9 +217,11 @@ public class BuyTourTest {
     }
 
     //---ПОЛЕ МЕСЯЦА---
+    @Feature("Форма")
+    @Story("Поле месяца")
     @ParameterizedTest
-    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле месяца заполнено невалидными значениями")
     @CsvFileSource(files = "src/test/resources/InvalidValuesMonth.csv")
+    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле месяца заполнено невалидными значениями")
     void shouldShowAnErrorMessageBelowTheMonthField_InvalidValues(String text) {
         var OrderCardPage = new OrderCardPage();
         var formFieldsInfo = DataHelper.getValidFieldSet();
@@ -192,6 +233,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Месяц", "Неверный формат");
     }
 
+    @Feature("Форма")
+    @Story("Поле месяца")
     @Test
     @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле месяца не заполнено")
     void shouldShowAnErrorMessageBelowTheMonthField_EmptyField() {
@@ -205,6 +248,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Месяц", "Поле обязательно для заполнения");
     }
 
+    @Feature("Форма")
+    @Story("Поле месяца")
     @Test
     @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле месяца заполнено нулями")
     void shouldShowAnErrorMessageBelowTheMonthField_OnlyZero() {
@@ -218,6 +263,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Месяц", "Неверный формат");
     }
 
+    @Feature("Форма")
+    @Story("Поле месяца")
     @Test
     @DisplayName("Проверяем, что нельзя ввести в поле месяц более 2-х цифр")
     void canOnlyEnter2DigitsTheMonthField() {
@@ -230,6 +277,8 @@ public class BuyTourTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Feature("Форма")
+    @Story("Поле месяца")
     @Test
     @DisplayName("Проверяем, что в поле месяца нельзя указать несуществующий месяцев")
     void shouldShowAnErrorMessageBelowTheMonthField_13Month() {
@@ -243,6 +292,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Месяц", "Неверно указан срок действия карты");
     }
 
+    @Feature("Форма")
+    @Story("Поле месяца")
     @Test
     @DisplayName("Проверяем выпадающее сообщения об ошибке, когда в форме указана карта, срок действия которой истек месяц назад")
     void shouldShowAnErrorMessageBelowTheMonthField_CardExpiredLastMonth() {
@@ -259,9 +310,11 @@ public class BuyTourTest {
     }
 
     //---ПОЛЕ ГОДА---
+    @Feature("Форма")
+    @Story("Поле года")
     @ParameterizedTest
-    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле года заполнено невалидными значениями")
     @CsvFileSource(files = "src/test/resources/InvalidValuesYear.csv")
+    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле года заполнено невалидными значениями")
     void shouldShowAnErrorMessageBelowTheYearField_InvalidValues(String text) {
         var OrderCardPage = new OrderCardPage();
         var formFieldsInfo = DataHelper.getValidFieldSet();
@@ -273,6 +326,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Год", "Неверный формат");
     }
 
+    @Feature("Форма")
+    @Story("Поле года")
     @Test
     @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле года не заполнено")
     void shouldShowAnErrorMessageBelowTheYearField_EmptyField() {
@@ -286,6 +341,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Год", "Поле обязательно для заполнения");
     }
 
+    @Feature("Форма")
+    @Story("Поле года")
     @Test
     @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле года заполнено нулями")
     void shouldShowAnErrorMessageBelowTheYearField_OnlyZero() {
@@ -299,6 +356,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Год", "Истёк срок действия карты");
     }
 
+    @Feature("Форма")
+    @Story("Поле года")
     @Test
     @DisplayName("Проверяем, что нельзя ввести в поле года более 2-х цифр")
     void canOnlyEnter2DigitsTheYearField() {
@@ -312,6 +371,8 @@ public class BuyTourTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Feature("Форма")
+    @Story("Поле года")
     @Test
     @DisplayName("Проверяем выпадающее сообщения об ошибке, когда в форме указана карта, срок действия которой истек год назад")
     void shouldShowAnErrorMessageBelowTheYearField_CardExpiredLastYear() {
@@ -328,9 +389,11 @@ public class BuyTourTest {
     }
 
     //---ПОЛЕ ВЛАДЕЛЬЦА---
+    @Feature("Форма")
+    @Story("Поле владельца")
     @ParameterizedTest
-    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле владельца заполнено невалидными значениями")
     @CsvFileSource(files = "src/test/resources/InvalidValuesOwner.csv")
+    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле владельца заполнено невалидными значениями")
     void shouldShowAnErrorMessageBelowTheOwnerField_InvalidValues(String text) {
         var OrderCardPage = new OrderCardPage();
         var formFieldsInfo = DataHelper.getValidFieldSet();
@@ -342,9 +405,11 @@ public class BuyTourTest {
         FormPage.errorMessage("Владелец", "Неверный формат");
     }
 
+    @Feature("Форма")
+    @Story("Поле владельца")
     @ParameterizedTest
-    @DisplayName("Проверяем, что форма отправляется, заполнив поле владельца некоторыми валидными значениями")
     @CsvFileSource(files = "src/test/resources/ValidValuesOwner.csv")
+    @DisplayName("Проверяем, что форма отправляется, заполнив поле владельца некоторыми валидными значениями")
     void shouldSuccessfullySubmitFormFilledWithSomeValidValues(String text) {
         var OrderCardPage = new OrderCardPage();
         var formFieldsInfo = DataHelper.getValidFieldSet();
@@ -354,6 +419,8 @@ public class BuyTourTest {
         FormPage.goToNotificationPage(formFieldsInfo);
     }
 
+    @Feature("Форма")
+    @Story("Поле владельца")
     @Test
     @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле владельца не заполнено")
     void shouldShowAnErrorMessageBelowTheOwnerField_EmptyField() {
@@ -367,6 +434,8 @@ public class BuyTourTest {
         FormPage.errorMessage("Владелец", "Поле обязательно для заполнения");
     }
 
+    @Feature("Форма")
+    @Story("Поле владельца")
     @Test
     @DisplayName("Проверяем, что нельзя ввести в поле владельца более 150-ти симвалов")
     void canOnlyEnter150SymbolsTheOwnerField() {
@@ -379,6 +448,8 @@ public class BuyTourTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Feature("Форма")
+    @Story("Поле владельца")
     @Test
     @DisplayName("Проверяем, что при введении в поле владельца символов в нижнем регистре, они будут преобразованы в верхний регистр")
     void shouldUppercaseConversion() {
@@ -392,9 +463,11 @@ public class BuyTourTest {
     }
 
     //---ПОЛЕ CVC/CVV---
+    @Feature("Форма")
+    @Story("Поле CVC/CVV")
     @ParameterizedTest
-    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле CVC/CVV заполнено невалидными значениями")
     @CsvFileSource(files = "src/test/resources/InvalidValuesCcvCvv.csv")
+    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле CVC/CVV заполнено невалидными значениями")
     void shouldShowAnErrorMessageBelowTheCcvCvvField_InvalidValues(String text) {
         var OrderCardPage = new OrderCardPage();
         var formFieldsInfo = DataHelper.getValidFieldSet();
@@ -406,6 +479,8 @@ public class BuyTourTest {
         FormPage.errorMessage("CVC/CVV", "Неверный формат");
     }
 
+    @Feature("Форма")
+    @Story("Поле CVC/CVV")
     @Test
     @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле CVC/CVV не заполнено")
     void shouldShowAnErrorMessageBelowTheCcvCvvField_EmptyField() {
@@ -419,6 +494,8 @@ public class BuyTourTest {
         FormPage.errorMessage("CVC/CVV", "Поле обязательно для заполнения");
     }
 
+    @Feature("Форма")
+    @Story("Поле CVC/CVV")
     @Test
     @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле CVC/CVV заполнено нулями")
     void shouldShowAnErrorMessageBelowTheCcvCvvField_OnlyZero() {
@@ -432,6 +509,8 @@ public class BuyTourTest {
         FormPage.errorMessage("CVC/CVV", "Неверный формат");
     }
 
+    @Feature("Форма")
+    @Story("Поле CVC/CVV")
     @Test
     @DisplayName("Проверяем, что нельзя ввести в поле CVC/CVV более 3-х цифр")
     void canOnlyEnter3DigitsTheCcvCvvField() {
@@ -445,6 +524,8 @@ public class BuyTourTest {
     }
 
     //---БАЗА ДАННЫХ---
+    @Feature("База данных")
+    @Story("Успешные операции")
     @Test
     @DisplayName("Проверяем, что приложение сохранет в своей БЗ успешно совершенный платеж по карте")
     void shouldStoreTheSuccessfullyTheCompletedCardPaymentInTheDatabase() {
@@ -465,6 +546,8 @@ public class BuyTourTest {
         }
     }
 
+    @Feature("База данных")
+    @Story("Успешные операции")
     @Test
     @DisplayName("Проверяем, что приложение сохранет в своей БЗ успешно совершенную покупку в кредит")
     void shouldStoreTheSuccessfullyTheCompletedPaymentOnTheCreditInTheDatabase() {
@@ -485,6 +568,8 @@ public class BuyTourTest {
         }
     }
 
+    @Feature("База данных")
+    @Story("Отказ в операции")
     @Test
     @DisplayName("Проверяем, что приложение сохранет в своей БЗ отказ в совершении платежа по карте")
     void shouldStoreTheDenialOfCardPaymentInTheDatabase() {
@@ -505,6 +590,8 @@ public class BuyTourTest {
         }
     }
 
+    @Feature("База данных")
+    @Story("Отказ в операции")
     @Test
     @DisplayName("Проверяем, что приложение сохранет в своей БЗ отказ в совершении покупке в кредит")
     void shouldStoreTheDenialOfPaymentOnTheCreditInTheDatabase() {
