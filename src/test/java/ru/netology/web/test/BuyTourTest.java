@@ -33,11 +33,23 @@ public class BuyTourTest {
         open("http://185.119.57.47:8080");
     }
 
-    //---ФУНКЦИОНАЛ КНОПОК---
+    //---ОБЩЕЕ---
+    @Feature("Карточка тура")
+    @Story("Общее")
+    @Test
+    @DisplayName("Проверяем, что пустая форма не будет отправлена на сервер")
+    void shouldNotSubmitAnEmptyForm() {
+        var OrderCardPage = new OrderCardPage();
+        var CardPaymentOnCreditPage = OrderCardPage.goToPaymentPage();
+        var FormPage = CardPaymentOnCreditPage.goToFormPage();
+        FormPage.formNotSend();
+    }
+
+    //---ФУНКЦИОНАЛ КНОПОК НА СТРАНИЦЕ---
     @Feature("Карточка тура")
     @Story("Кнопки 'Купить' и 'Купить в кредит'")
     @Test
-    @DisplayName("Проверяем статус кнопок на изначальной карточке заказа (обе должны быть красного цвета)")
+    @DisplayName("Проверяем статус кнопок на изначальной карточке покупки тура (обе должны быть красного цвета)")
     void shouldCheckButtonStatusOnTheOrderCard() {
         var OrderCardPage = new OrderCardPage();
         OrderCardPage.buttonStatusExtraStart();
@@ -75,7 +87,7 @@ public class BuyTourTest {
         FormPage.goToNotificationPage(formFieldsInfo);
     }
 
-    //---ОБЩЕЕ---
+    //---ВЫПАДАЮЩИЕ СООБЩЕНИЯ НА ОТВЕТ ОТ БАНКОВСКИХ СЕРВИСОВ---
     @Feature("Карточка тура")
     @Story("Выпадающие сообщения")
     @Test
@@ -130,33 +142,21 @@ public class BuyTourTest {
         FormPage.notificationError();
     }
 
-    @Feature("Карточка тура")
-    @Story("Общее")
-    @Test
-    @DisplayName("Проверяем, что пустая форма не будет отправлена на сервер")
-    void shouldNotSubmitAnEmptyForm() {
-        var OrderCardPage = new OrderCardPage();
-        var CardPaymentOnCreditPage = OrderCardPage.goToPaymentPage();
-        var FormPage = CardPaymentOnCreditPage.goToFormPage();
-        FormPage.formNotSend();
-    }
-
-    //---ВАЛИДАЦИЯ ПОЛЕЙ---
+    //---ВАЛИДАЦИЯ ПОЛЕЙ ФОРМЫ---
     //---ПОЛЕ НОМЕРА КАРТЫ---
     @Feature("Форма")
     @Story("Поле номера карты")
     @ParameterizedTest
     @CsvFileSource(files = "src/test/resources/InvalidValuesCardNumber.csv")
-    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле карты заполнено невалидными значениями")
-    void shouldShowAnErrorMessageBelowTheCardNumberField_InvalidValues(String text) {
+    @DisplayName("Проверяем, что в поле карты нельзя ввести некоторые невалидные значения")
+    void shouldCheckWhatCannotBeEnteredInTheCardNumberFieldSomeInvalidValues(String text) {
         var OrderCardPage = new OrderCardPage();
-        var formFieldsInfo = DataHelper.getValidFieldSet();
-        formFieldsInfo.setCardNumber(text);
         var CardPaymentPage = OrderCardPage.goToPaymentPage();
         var FormPage = CardPaymentPage.goToFormPage();
-        FormPage.fillingOutFormFields(formFieldsInfo);
-        FormPage.formNotSend();
-        FormPage.errorMessage("Номер карты", "Неверный формат");
+        FormPage.setFieldValue("Номер карты", text);
+        String expected = "";
+        String actual = FormPage.getFieldValue("Номер карты");
+        Assertions.assertEquals(expected, actual);
     }
 
     @Feature("Форма")
@@ -205,6 +205,22 @@ public class BuyTourTest {
     @Feature("Форма")
     @Story("Поле номера карты")
     @Test
+    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле карты заполнено 15-ю символами")
+    void shouldShowAnErrorMessageBelowTheCardNumberFieldWhenEntered15Symbol() {
+        var OrderCardPage = new OrderCardPage();
+        var formFieldsInfo = DataHelper.getValidFieldSet();
+        formFieldsInfo.setCardNumber("444444444444441");
+        var CardPaymentPage = OrderCardPage.goToPaymentPage();
+        var FormPage = CardPaymentPage.goToFormPage();
+        FormPage.fillingOutFormFields(formFieldsInfo);
+        FormPage.formNotSend();
+        FormPage.errorMessage("Номер карты", "Неверный формат");
+
+    }
+
+    @Feature("Форма")
+    @Story("Поле номера карты")
+    @Test
     @DisplayName("Проверяем, что нельзя ввести в поле карты более 16-ти цифр")
     void canOnlyEnter16Digits() {
         var OrderCardPage = new OrderCardPage();
@@ -221,16 +237,15 @@ public class BuyTourTest {
     @Story("Поле месяца")
     @ParameterizedTest
     @CsvFileSource(files = "src/test/resources/InvalidValuesMonth.csv")
-    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле месяца заполнено невалидными значениями")
-    void shouldShowAnErrorMessageBelowTheMonthField_InvalidValues(String text) {
+    @DisplayName("Проверяем, что в поле месяца нельзя ввести некоторые невалидные значения")
+    void shouldCheckWhatCannotBeEnteredInTheMonthFieldSomeInvalidValues(String text) {
         var OrderCardPage = new OrderCardPage();
-        var formFieldsInfo = DataHelper.getValidFieldSet();
-        formFieldsInfo.setMonth(text);
         var CardPaymentPage = OrderCardPage.goToPaymentPage();
         var FormPage = CardPaymentPage.goToFormPage();
-        FormPage.fillingOutFormFields(formFieldsInfo);
-        FormPage.formNotSend();
-        FormPage.errorMessage("Месяц", "Неверный формат");
+        FormPage.setFieldValue("Месяц", text);
+        String expected = "";
+        String actual = FormPage.getFieldValue("Месяц");
+        Assertions.assertEquals(expected, actual);
     }
 
     @Feature("Форма")
@@ -256,6 +271,21 @@ public class BuyTourTest {
         var OrderCardPage = new OrderCardPage();
         var formFieldsInfo = DataHelper.getValidFieldSet();
         formFieldsInfo.setMonth("00");
+        var CardPaymentPage = OrderCardPage.goToPaymentPage();
+        var FormPage = CardPaymentPage.goToFormPage();
+        FormPage.fillingOutFormFields(formFieldsInfo);
+        FormPage.formNotSend();
+        FormPage.errorMessage("Месяц", "Неверный формат");
+    }
+
+    @Feature("Форма")
+    @Story("Поле месяца")
+    @Test
+    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле месяца заполнено одним символом")
+    void shouldShowAnErrorMessageBelowTheMonthFieldWhenEnteredOneSymbol() {
+        var OrderCardPage = new OrderCardPage();
+        var formFieldsInfo = DataHelper.getValidFieldSet();
+        formFieldsInfo.setMonth("3");
         var CardPaymentPage = OrderCardPage.goToPaymentPage();
         var FormPage = CardPaymentPage.goToFormPage();
         FormPage.fillingOutFormFields(formFieldsInfo);
@@ -315,15 +345,14 @@ public class BuyTourTest {
     @ParameterizedTest
     @CsvFileSource(files = "src/test/resources/InvalidValuesYear.csv")
     @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле года заполнено невалидными значениями")
-    void shouldShowAnErrorMessageBelowTheYearField_InvalidValues(String text) {
+    void shouldCheckWhatCannotBeEnteredInTheYearFieldSomeInvalidValues(String text) {
         var OrderCardPage = new OrderCardPage();
-        var formFieldsInfo = DataHelper.getValidFieldSet();
-        formFieldsInfo.setYear(text);
         var CardPaymentPage = OrderCardPage.goToPaymentPage();
         var FormPage = CardPaymentPage.goToFormPage();
-        FormPage.fillingOutFormFields(formFieldsInfo);
-        FormPage.formNotSend();
-        FormPage.errorMessage("Год", "Неверный формат");
+        FormPage.setFieldValue("Год", text);
+        String expected = "";
+        String actual = FormPage.getFieldValue("Год");
+        Assertions.assertEquals(expected, actual);
     }
 
     @Feature("Форма")
@@ -354,6 +383,21 @@ public class BuyTourTest {
         FormPage.fillingOutFormFields(formFieldsInfo);
         FormPage.formNotSend();
         FormPage.errorMessage("Год", "Истёк срок действия карты");
+    }
+
+    @Feature("Форма")
+    @Story("Поле года")
+    @Test
+    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле года заполнено одним символом")
+    void shouldShowAnErrorMessageBelowTheYearFieldWhenEnteredOneSymbol() {
+        var OrderCardPage = new OrderCardPage();
+        var formFieldsInfo = DataHelper.getValidFieldSet();
+        formFieldsInfo.setYear("3");
+        var CardPaymentPage = OrderCardPage.goToPaymentPage();
+        var FormPage = CardPaymentPage.goToFormPage();
+        FormPage.fillingOutFormFields(formFieldsInfo);
+        FormPage.formNotSend();
+        FormPage.errorMessage("Год", "Неверный формат");
     }
 
     @Feature("Форма")
@@ -393,16 +437,15 @@ public class BuyTourTest {
     @Story("Поле владельца")
     @ParameterizedTest
     @CsvFileSource(files = "src/test/resources/InvalidValuesOwner.csv")
-    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле владельца заполнено невалидными значениями")
-    void shouldShowAnErrorMessageBelowTheOwnerField_InvalidValues(String text) {
+    @DisplayName("Проверяем, что в поле владельца нельзя ввести некоторые невалидные значения")
+    void shouldCheckWhatCannotBeEnteredInTheOwnerFieldSomeInvalidValues(String text) {
         var OrderCardPage = new OrderCardPage();
-        var formFieldsInfo = DataHelper.getValidFieldSet();
-        formFieldsInfo.setOwner(text);
         var CardPaymentPage = OrderCardPage.goToPaymentPage();
         var FormPage = CardPaymentPage.goToFormPage();
-        FormPage.fillingOutFormFields(formFieldsInfo);
-        FormPage.formNotSend();
-        FormPage.errorMessage("Владелец", "Неверный формат");
+        FormPage.setFieldValue("Владелец", text);
+        String expected = "";
+        String actual = FormPage.getFieldValue("Владелец");
+        Assertions.assertEquals(expected, actual);
     }
 
     @Feature("Форма")
@@ -432,6 +475,21 @@ public class BuyTourTest {
         FormPage.fillingOutFormFields(formFieldsInfo);
         FormPage.formNotSend();
         FormPage.errorMessage("Владелец", "Поле обязательно для заполнения");
+    }
+
+    @Feature("Форма")
+    @Story("Поле владельца")
+    @Test
+    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле владельца заполнено одним символом")
+    void shouldShowAnErrorMessageBelowTheOwnerFieldWheEnteredOneSymbol() {
+        var OrderCardPage = new OrderCardPage();
+        var formFieldsInfo = DataHelper.getValidFieldSet();
+        formFieldsInfo.setOwner("Q");
+        var CardPaymentPage = OrderCardPage.goToPaymentPage();
+        var FormPage = CardPaymentPage.goToFormPage();
+        FormPage.fillingOutFormFields(formFieldsInfo);
+        FormPage.formNotSend();
+        FormPage.errorMessage("Владелец", "Неверный формат");
     }
 
     @Feature("Форма")
@@ -467,16 +525,15 @@ public class BuyTourTest {
     @Story("Поле CVC/CVV")
     @ParameterizedTest
     @CsvFileSource(files = "src/test/resources/InvalidValuesCcvCvv.csv")
-    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле CVC/CVV заполнено невалидными значениями")
-    void shouldShowAnErrorMessageBelowTheCcvCvvField_InvalidValues(String text) {
+    @DisplayName("Проверяем, что в поле CVC/CVV нельзя ввести некоторые невалидные значения")
+    void shouldCheckWhatCannotBeEnteredInTheCcvCvvFieldSomeInvalidValues(String text) {
         var OrderCardPage = new OrderCardPage();
-        var formFieldsInfo = DataHelper.getValidFieldSet();
-        formFieldsInfo.setCcvCvv(text);
         var CardPaymentPage = OrderCardPage.goToPaymentPage();
         var FormPage = CardPaymentPage.goToFormPage();
-        FormPage.fillingOutFormFields(formFieldsInfo);
-        FormPage.formNotSend();
-        FormPage.errorMessage("CVC/CVV", "Неверный формат");
+        FormPage.setFieldValue("CVC/CVV", text);
+        String expected = "";
+        String actual = FormPage.getFieldValue("CVC/CVV");
+        Assertions.assertEquals(expected, actual);
     }
 
     @Feature("Форма")
@@ -502,6 +559,22 @@ public class BuyTourTest {
         var OrderCardPage = new OrderCardPage();
         var formFieldsInfo = DataHelper.getValidFieldSet();
         formFieldsInfo.setCcvCvv("000");
+        var CardPaymentPage = OrderCardPage.goToPaymentPage();
+        var FormPage = CardPaymentPage.goToFormPage();
+        FormPage.fillingOutFormFields(formFieldsInfo);
+        FormPage.formNotSend();
+        FormPage.errorMessage("CVC/CVV", "Неверный формат");
+    }
+
+
+    @Feature("Форма")
+    @Story("Поле CVC/CVV")
+    @Test
+    @DisplayName("Проверяем выпадающее сообщение об ошибке, когда поле CVC/CVV заполнено двумя символами")
+    void shouldShowAnErrorMessageBelowTheCcvCvvFieldWheEnteredTwoSymbol() {
+        var OrderCardPage = new OrderCardPage();
+        var formFieldsInfo = DataHelper.getValidFieldSet();
+        formFieldsInfo.setCcvCvv("23");
         var CardPaymentPage = OrderCardPage.goToPaymentPage();
         var FormPage = CardPaymentPage.goToFormPage();
         FormPage.fillingOutFormFields(formFieldsInfo);
