@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class CreditRequestEntityRepositorySQL {
+public class CreditRequestEntityRepositoryMySQL {
     QueryRunner runner = new QueryRunner();
 
     Connection getConnection() throws SQLException {
