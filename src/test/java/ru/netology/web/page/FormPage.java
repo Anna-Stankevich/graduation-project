@@ -19,7 +19,7 @@ public class FormPage {
     private SelenideElement notificationOk = $(".notification_status_ok");
     private SelenideElement activeNotification = $(".notification_visible");
 
-    public void fillingOutFormFields(DataHelper.FieldSet info){
+    public void fillingOutFormFields(DataHelper.FieldSet info) {
         fieldSet.find(Condition.exactText("Номер карты")).closest(".input__inner").$(".input__control").setValue(info.getCardNumber());
         fieldSet.find(Condition.exactText("Месяц")).closest(".input__inner").$(".input__control").setValue(info.getMonth());
         fieldSet.find(Condition.exactText("Год")).closest(".input__inner").$(".input__control").setValue(info.getYear());
@@ -27,35 +27,38 @@ public class FormPage {
         fieldSet.find(Condition.exactText("CVC/CVV")).closest(".input__inner").$(".input__control").setValue(info.getCcvCvv());
     }
 
-    public void formNotSend(){
+    public void formNotSend() {
         button.click();
         notClickableButton.shouldBe(not(visible));
     }
 
-    public void goToNotificationPage(DataHelper.FieldSet info){
+    public void goToNotificationPage(DataHelper.FieldSet info) {
         fillingOutFormFields(info);
         button.click();
         notClickableButton.shouldBe(visible, disabled);
     }
-    public void activeNotification(){
+
+    public void activeNotification() {
         activeNotification.shouldBe(Condition.visible, Duration.ofSeconds(15));
     }
-    public void notificationError(){
+
+    public void notificationError() {
         notificationError.shouldHave(Condition.text("Ошибка"), Duration.ofSeconds(15)).shouldBe(Condition.visible);
     }
 
-    public void notificationOk(){
+    public void notificationOk() {
         notificationOk.shouldHave(Condition.text("Успешно"), Duration.ofSeconds(15)).shouldBe(Condition.visible);
     }
 
-    public void errorMessage(String field, String textErrorMessage){
+    public void errorMessage(String field, String textErrorMessage) {
         fieldSet.find(Condition.exactText(field)).closest(".input__inner").$(".input__sub").shouldHave(Condition.exactText(textErrorMessage)).shouldBe(visible);
     }
 
-    public void setFieldValue(String field, String values){
+    public void setFieldValue(String field, String values) {
         fieldSet.find(Condition.exactText(field)).closest(".input__inner").$(".input__control").setValue(values);
     }
-    public String getFieldValue(String field){
+
+    public String getFieldValue(String field) {
         return fieldSet.find(Condition.exactText(field)).closest(".input__inner").$(".input__control").val();
     }
 

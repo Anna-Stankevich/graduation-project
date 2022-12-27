@@ -12,23 +12,11 @@ public class DataHelper {
     private DataHelper() {
     }
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    public static class FieldSet {
-        private String cardNumber;
-        private String month;
-        private String year;
-        private String owner;
-        private String ccvCvv;
-    }
-
     public static FieldSet getValidFieldSet() {
         var random = new Random();
         var date = generateDate();
         return new FieldSet("4444444444444441", String.format("|%02d|", date.getMonthValue()), String.format("%d", date.getYear()).substring(2), "ANNA", String.format("|%03d|", random.nextInt(999)));
     }
-
 
     public static LocalDate generateDate() {
         long minDay = LocalDate.now().toEpochDay();
@@ -43,6 +31,17 @@ public class DataHelper {
 
     public static LocalDate prevYear() {
         return LocalDate.now().minusYears(1);
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class FieldSet {
+        private String cardNumber;
+        private String month;
+        private String year;
+        private String owner;
+        private String ccvCvv;
     }
 
 }
