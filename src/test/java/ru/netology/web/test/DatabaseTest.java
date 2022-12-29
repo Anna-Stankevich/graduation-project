@@ -46,7 +46,7 @@ public class DatabaseTest {
         var cardPaymentPage = orderCardPage.goToPaymentPage();
         var formPage = cardPaymentPage.goToFormPage();
         formPage.goToNotificationPage(formFieldsInfo);
-        formPage.notificationOk();
+        formPage.activeNotification();
 
         int actualCount = rep.getStatusCount("APPROVED");
 
@@ -89,6 +89,7 @@ public class DatabaseTest {
         var cardPaymentPage = orderCardPage.goToPaymentPage();
         var formPage = cardPaymentPage.goToFormPage();
         formPage.goToNotificationPage(formFieldsInfo);
+        formPage.activeNotification();
 
         int actualCount = rep.getStatusCount("DECLINED");
 
@@ -111,6 +112,7 @@ public class DatabaseTest {
         var cardPaymentOnCreditPage = orderCardPage.goToPaymentOnCreditPage();
         var formPage = cardPaymentOnCreditPage.goToFormPage();
         formPage.goToNotificationPage(formFieldsInfo);
+        formPage.activeNotification();
 
         int actualCount = rep.getStatusCount("DECLINED");
 
@@ -131,7 +133,7 @@ public class DatabaseTest {
         var cardPaymentPage = orderCardPage.goToPaymentPage();
         var formPage = cardPaymentPage.goToFormPage();
         formPage.goToNotificationPage(formFieldsInfo);
-        formPage.notificationOk();
+        formPage.activeNotification();
 
         int actualCount = rep.getStatusCount("APPROVED");
 
@@ -174,6 +176,7 @@ public class DatabaseTest {
         var cardPaymentPage = orderCardPage.goToPaymentPage();
         var formPage = cardPaymentPage.goToFormPage();
         formPage.goToNotificationPage(formFieldsInfo);
+        formPage.activeNotification();
 
         int actualCount = rep.getStatusCount("DECLINED");
 
@@ -196,6 +199,7 @@ public class DatabaseTest {
         var cardPaymentOnCreditPage = orderCardPage.goToPaymentOnCreditPage();
         var formPage = cardPaymentOnCreditPage.goToFormPage();
         formPage.goToNotificationPage(formFieldsInfo);
+        formPage.activeNotification();
 
         int actualCount = rep.getStatusCount("DECLINED");
 
