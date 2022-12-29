@@ -30,7 +30,7 @@ dependencies {
     testImplementation 'mysql:mysql-connector-java:8.0.30'
     testImplementation 'commons-dbutils:commons-dbutils:1.7'
     testImplementation 'io.qameta.allure:allure-selenide:2.16.1'
-    testImplementation 'org.testcontainers:postgresql:1.17.6'
+    testImplementation 'org.postgresql:postgresql:42.5.1'
 }
 
 test {
