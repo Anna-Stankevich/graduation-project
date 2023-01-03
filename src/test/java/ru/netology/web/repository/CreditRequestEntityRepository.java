@@ -7,11 +7,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class CreditRequestEntityRepositoryMySQL {
+public class CreditRequestEntityRepository {
     QueryRunner runner = new QueryRunner();
 
     Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://185.119.57.47:3306/app", "app", "pass");
+        return DriverManager.getConnection(System.getProperty("datasource.url"), "app", "pass");
     }
 
     public int getStatusCount(String status) throws SQLException {
