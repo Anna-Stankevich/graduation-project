@@ -3,7 +3,6 @@ package ru.netology.web.test;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import io.qameta.allure.*;
 import io.qameta.allure.selenide.AllureSelenide;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import ru.netology.web.data.DataHelper;
 import ru.netology.web.page.OrderCardPage;
@@ -26,7 +25,7 @@ public class DatabaseTest {
 
     @BeforeEach
     void setupTest() {
-        open("http://185.119.57.47:8080");
+        open(System.getProperty("application.address"));
     }
 
     //---БАЗА ДАННЫХ---
@@ -34,7 +33,6 @@ public class DatabaseTest {
     @Story("Успешные операции")
     @Test
     @DisplayName("Проверяем, что приложение сохранет в своей БЗ успешно совершенный платеж по карте")
-    @SneakyThrows
     void shouldStoreTheSuccessfullyTheCompletedCardPaymentInTheDatabase() {
         var rep = new PaymentEntityRepository();
         int count = rep.getStatusCount("APPROVED");
@@ -55,7 +53,6 @@ public class DatabaseTest {
     @Story("Успешные операции")
     @Test
     @DisplayName("Проверяем, что приложение сохранет в своей БЗ успешно совершенную покупку в кредит")
-    @SneakyThrows
     void shouldStoreTheSuccessfullyTheCompletedPaymentOnTheCreditInTheDatabase() {
         var rep = new CreditRequestEntityRepository();
         int count = rep.getStatusCount("APPROVED");
@@ -76,7 +73,6 @@ public class DatabaseTest {
     @Story("Отказ в операции")
     @Test
     @DisplayName("Проверяем, что приложение сохранет в своей БЗ отказ в совершении платежа по карте")
-    @SneakyThrows
     void shouldStoreTheDenialOfCardPaymentInTheDatabase() {
         var rep = new PaymentEntityRepository();
         int count = rep.getStatusCount("DECLINED");
@@ -99,7 +95,6 @@ public class DatabaseTest {
     @Story("Отказ в операции")
     @Test
     @DisplayName("Проверяем, что приложение сохранет в своей БЗ отказ в совершении покупке в кредит")
-    @SneakyThrows
     void shouldStoreTheDenialOfPaymentOnTheCreditInTheDatabase() {
         var rep = new CreditRequestEntityRepository();
         int count = rep.getStatusCount("DECLINED");

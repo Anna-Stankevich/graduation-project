@@ -23,7 +23,7 @@ public class PaymentOnTheCreditTest {
 
     @BeforeEach
     void setupTest() {
-        open("http://185.119.57.47:8080");
+        open(System.getProperty("application.address"));
     }
 
     //---ВЫПАДАЮЩИЕ СООБЩЕНИЯ НА ОТВЕТ ОТ БАНКОВСКИХ СЕРВИСОВ---
